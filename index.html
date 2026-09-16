@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MGM Smart Canteen | Mahatma Gandhi Mission College of Engineering & Technology, Navi Mumbai</title>
+    <meta name="description" content="Official Smart Canteen portal of MGM College of Engineering and Technology, Navi Mumbai. Skip the campus queue, order fresh food, and track your digital tokens in real-time.">
+    <meta name="theme-color" content="#0D2149">
+    
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="css/style.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="Public/mgm-logo.png.png">
+</head>
+<body>
+
+    <!-- ==================== 0. ATTRACTIVE LOGIN PAGE (DEFAULT ENTRY) ==================== -->
+    <div id="login-view" class="login-view-wrapper">
+        <!-- Ambient Glowing Backdrop Orbs -->
+        <div class="login-ambient-orb orb-1"></div>
+        <div class="login-ambient-orb orb-2"></div>
+        <div class="login-ambient-orb orb-3"></div>
+
+        <div class="login-container">
+            <!-- MGM College Brand Header -->
+            <div class="login-brand-header">
+                <div class="login-logo-glow">
+                    <img src="Public/mgm-logo.png.png" alt="MGM College of Engineering & Technology Logo" class="login-logo-img">
+                </div>
+                <h1 class="login-college-title">Mahatma Gandhi Mission</h1>
+                <p class="login-college-sub">College of Engineering & Technology, Navi Mumbai</p>
+                <div class="login-badge">
+                    <span class="badge-pulse"></span>
+                    <span>MGM FastTrack Smart Canteen Portal</span>
+                </div>
+            </div>
+
+            <!-- Login Card -->
+            <div class="login-card">
+                <div class="login-card-header">
+                    <h2>Welcome Back, MGMite! 👋</h2>
+                    <p>Sign in with your College UID to order food & skip canteen lines</p>
+                </div>
+
+                <!-- Error Alert Box -->
+                <div id="login-error-alert" class="login-alert" style="display: none;">
+                    <span class="alert-icon">⚠️</span>
+                    <span id="login-error-msg">Please enter your College UID and Password.</span>
+                </div>
+
+                <!-- Login Form -->
+                <form id="login-form" onsubmit="window.SmartCanteen.handleLogin(event)">
+                    <!-- UID Field -->
+                    <div class="form-group">
+                        <label for="login-uid">College UID / Roll No.</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">🪪</span>
+                            <input type="text" id="login-uid" class="login-input" placeholder="e.g. 21MGMCE048 or MGM2026" autocomplete="username" required>
+                        </div>
+                    </div>
+
+                    <!-- Password Field -->
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">🔒</span>
+                            <input type="password" id="login-password" class="login-input" placeholder="Enter your account password" autocomplete="current-password" required>
+                            <button type="button" class="btn-toggle-pwd" id="toggle-pwd-btn" onclick="window.SmartCanteen.togglePasswordVisibility()" aria-label="Toggle password visibility">
+                                <span id="pwd-toggle-icon">👁️</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Options Row -->
+                    <div class="login-options-row">
+                        <label class="remember-label">
+                            <input type="checkbox" id="login-remember-me" checked>
+                            <span>Remember Me</span>
+                        </label>
+                        <a href="javascript:void(0)" class="forgot-link" onclick="window.SmartCanteen.openForgotPasswordModal()">Forgot Password?</a>
+                    </div>
+
+                    <!-- Login Button -->
+                    <button type="submit" class="btn-login" id="btn-login-submit">
+                        <span class="login-btn-text">Sign In to Smart Canteen ➔</span>
+                        <span class="login-spinner" style="display: none;"></span>
+                    </button>
+
+                    <!-- Evaluation Quick Fill Demo Helper -->
+                    <div class="login-demo-box">
+                        <div class="demo-pill-title">💡 Fast Evaluation Demo Access:</div>
+                        <div class="demo-pill-action" onclick="window.SmartCanteen.demoFillLogin()">
+                            <span>Auto-Fill Demo Credentials: <strong>21MGMCE048</strong></span>
+                            <span class="demo-chip-btn">Click to Fill</span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Login Footer Note -->
+            <div class="login-footer-info">
+                <span>🛡️ Official MGMCET Campus Dining Portal • Sector 1, Kamothe, Navi Mumbai</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== DASHBOARD VIEW (HIDDEN UNTIL LOGIN) ==================== -->
+    <div id="dashboard-view" style="display: none;">
+
+        <!-- 1. Top Announcement Bar -->
+        <div class="announcement-bar" id="announcement-bar">
+            <div class="announcement-text">
+                <span class="announcement-pill">LIVE KITCHEN</span>
+                <span>⚡ Order now & pickup in 8-12 mins • Freshly cooked for MGMites</span>
+            </div>
+            <div class="announcement-right">
+                <span>📍 Kamothe, Navi Mumbai Campus</span>
+                <span>⏰ 7:30 AM – 6:30 PM</span>
+            </div>
+        </div>
+
+        <!-- 2. Main Navigation Bar -->
+        <header class="navbar" id="navbar">
+            <div class="nav-container">
+                <!-- Brand / Logo -->
+                <a href="#" class="brand-wrapper" aria-label="MGM College Smart Canteen">
+                    <div class="logo-frame">
+                        <img src="Public/mgm-logo.png.png" alt="MGM College of Engineering Logo" class="college-logo-img">
+                    </div>
+                    <div class="brand-titles">
+                        <span class="college-name">MGM Smart Canteen</span>
+                        <span class="college-sub">College of Engineering & Technology, Navi Mumbai</span>
+                    </div>
+                </a>
+
+                <!-- Navigation Links -->
+                <nav>
+                    <ul class="nav-links">
+                        <li><a href="#combos" class="nav-link">🔥 Combos</a></li>
+                        <li><a href="#menu" class="nav-link">🍽️ Menu</a></li>
+                        <li><a href="#crowd-status" class="nav-link">📊 Live Rush</a></li>
+                        <li><a href="#reviews" class="nav-link">💬 Reviews</a></li>
+                    </ul>
+                </nav>
+
+                <!-- Navigation Controls -->
+                <div class="nav-controls">
+                    <!-- Theme Toggle Button -->
+                    <button class="icon-btn" id="theme-toggle-btn" onclick="window.SmartCanteen.toggleTheme()" aria-label="Toggle Theme" title="Toggle Theme">
+                        ☀️
+                    </button>
+
+                    <!-- Kitchen Staff Portal Button -->
+                    <button class="staff-btn" onclick="window.SmartCanteen.openStaffModal()" title="Canteen Staff Kitchen Dashboard">
+                        <span>👨‍🍳</span>
+                        <span class="desktop-text">Staff View</span>
+                    </button>
+
+                    <!-- Authenticated User Profile & Logout -->
+                    <div class="user-nav-badge" id="nav-user-badge">
+                        <span class="user-avatar-pill">🎓</span>
+                        <div class="user-nav-details">
+                            <span class="user-nav-name" id="nav-user-name">21MGMCE048</span>
+                            <span class="user-nav-role">MGM Student</span>
+                        </div>
+                        <button class="btn-logout" onclick="window.SmartCanteen.handleLogout()" title="Log out from Smart Canteen">
+                            <span>🚪</span>
+                            <span class="desktop-text">Logout</span>
+                        </button>
+                    </div>
+
+                    <!-- Cart Button -->
+                    <button class="icon-btn" id="nav-cart-btn" onclick="window.SmartCanteen.openDrawer()" aria-label="View Cart Tray" title="View Cart Tray">
+                        🛒
+                        <span class="cart-counter-badge cart-count">0</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+    <!-- 3. Hero Section -->
+    <section class="hero-section">
+        <div class="hero-container">
+            <div class="hero-content">
+                <div class="hero-tag">
+                    <span class="hero-tag-radar"></span>
+                    MGM FastTrack Campus Dining
+                </div>
+                <h1 class="hero-title">
+                    Skip the Queue. <br>
+                    <span class="gradient-text">Savor Every Break.</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Order authentic Mumbai snacks, wholesome MGM thalis, and chilled beverages straight from your lecture hall or lab. Pick up hot with your digital token.
+                </p>
+
+                <div class="hero-actions">
+                    <a href="#menu" class="btn-primary">
+                        <span>🍽️</span> Order Food Now
+                    </a>
+                    <button class="btn-secondary" onclick="window.SmartCanteen.openActiveOrderModal()">
+                        <span>🔔</span> Track Live Token
+                    </button>
+                </div>
+
+                <div class="hero-features-row">
+                    <div class="hero-feat-item">
+                        <span class="icon">⚡</span>
+                        <span>Zero Wait Ordering</span>
+                    </div>
+                    <div class="hero-feat-item">
+                        <span class="icon">📱</span>
+                        <span>UPI & Cash Counter</span>
+                    </div>
+                    <div class="hero-feat-item">
+                        <span class="icon">🥗</span>
+                        <span>100% Hygienic Kitchen</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Canteen Rush Status Card -->
+            <div class="rush-card" id="crowd-status">
+                <div class="rush-card-header">
+                    <div class="rush-card-title">
+                        <span>📊</span> Canteen Rush Meter
+                    </div>
+                    <div class="rush-badge badge-moderate" id="rush-status-badge">
+                        <span>●</span> Moderate Rush
+                    </div>
+                </div>
+
+                <div class="rush-meter-wrapper">
+                    <div class="rush-meter-labels">
+                        <span>Low Rush</span>
+                        <span>Moderate</span>
+                        <span>Peak Lunch</span>
+                    </div>
+                    <div class="rush-progress-bar">
+                        <div class="rush-progress-fill" id="rush-progress-fill" style="width: 55%;"></div>
+                    </div>
+                </div>
+
+                <div class="rush-stats-grid">
+                    <div class="rush-stat-box">
+                        <div class="rush-stat-label">Avg. Wait Time</div>
+                        <div class="rush-stat-value" id="rush-wait-time">10 - 15 mins</div>
+                    </div>
+                    <div class="rush-stat-box">
+                        <div class="rush-stat-label">Seating Status</div>
+                        <div class="rush-stat-value" id="rush-tables-free">12 / 30 tables free</div>
+                    </div>
+                </div>
+
+                <div class="rush-note" id="rush-desc">
+                    Normal canteen flow. Order now to skip wait!
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. Active Token Mini Banner (Visible when order is active) -->
+    <div class="active-tracker-banner" id="active-tracker-banner" style="display: none;">
+        <div class="tracker-left">
+            <div class="tracker-token-badge" id="banner-token-num">#MGM-101</div>
+            <div class="tracker-status-info">
+                <h4 id="banner-status-text">Order Received by Kitchen</h4>
+                <p id="banner-order-desc">2 items • Counter Pickup</p>
+            </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <div class="tracker-steps-mini">
+                <div class="mini-step completed">1</div>
+                <div class="mini-step active">2</div>
+                <div class="mini-step">3</div>
+                <div class="mini-step">4</div>
+            </div>
+            <button class="btn-primary" style="padding: 8px 16px; font-size: 0.85rem;" onclick="window.SmartCanteen.openActiveOrderModal()">
+                View KOT & QR
+            </button>
+        </div>
+    </div>
+
+    <!-- 5. Campus Combos Section -->
+    <section class="combos-section" id="combos">
+        <div class="section-header-row">
+            <div class="section-title-wrap">
+                <h2>🔥 Campus Value Combos</h2>
+                <p>Curated pocket-friendly budget meals for MGM students and faculty</p>
+            </div>
+            <div>
+                <span class="announcement-pill" style="background: rgba(255,102,0,0.15); color: var(--primary); border: 1px solid var(--primary); font-size: 0.8rem;">
+                    USE CODE: MGM10 FOR EXTRA 10% OFF
+                </span>
+            </div>
+        </div>
+
+        <div class="combos-grid" id="combos-grid">
+            <!-- Dynamic Combos rendered via js/app.js -->
+        </div>
+    </section>
+
+    <!-- 6. Main Menu Section -->
+    <section class="menu-section" id="menu">
+        <div class="section-header-row">
+            <div class="section-title-wrap">
+                <h2>🍽️ Full Canteen Menu</h2>
+                <p>Freshly prepared South Indian staples, Mumbai snacks, hot meals & beverages</p>
+            </div>
+        </div>
+
+        <!-- Controls: Search, Sort, Categories, Dietary -->
+        <div class="menu-controls-bar">
+            <div class="search-and-sort">
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" 
+                           id="menu-search-input" 
+                           class="search-input" 
+                           placeholder="Search Vada Pav, Masala Dosa, Chai, Thali, Maggi..." 
+                           oninput="window.SmartCanteen.handleSearch(this.value)" />
+                </div>
+                <select class="sort-select" onchange="window.SmartCanteen.setSortBy(this.value)">
+                    <option value="popular">⭐ Most Popular</option>
+                    <option value="price-low">💰 Price: Low to High</option>
+                    <option value="price-high">💎 Price: High to Low</option>
+                    <option value="rating">🌟 Highest Rated</option>
+                    <option value="time">⏱️ Fastest Prep Time</option>
+                </select>
+            </div>
+
+            <!-- Categories -->
+            <div class="category-pills-row" id="category-pills-row">
+                <!-- Dynamically rendered pills -->
+            </div>
+
+            <!-- Dietary Filters -->
+            <div class="dietary-pills-row">
+                <span class="dietary-label">Preference:</span>
+                <button class="diet-pill active" data-diet="all" onclick="window.SmartCanteen.setDietaryFilter('all')">
+                    All Items
+                </button>
+                <button class="diet-pill" data-diet="veg" onclick="window.SmartCanteen.setDietaryFilter('veg')">
+                    🟢 Pure Veg
+                </button>
+                <button class="diet-pill" data-diet="jain" onclick="window.SmartCanteen.setDietaryFilter('jain')">
+                    🟡 Jain Available
+                </button>
+                <button class="diet-pill" data-diet="spicy" onclick="window.SmartCanteen.setDietaryFilter('spicy')">
+                    🌶️ Spicy Mumbai Hits
+                </button>
+            </div>
+        </div>
+
+        <!-- Menu Grid -->
+        <div class="menu-grid" id="menu-grid">
+            <!-- Dynamic dishes rendered via js/app.js -->
+        </div>
+    </section>
+
+    <!-- 7. Feedback & Testimonials Section -->
+    <section class="feedback-section" id="reviews">
+        <div class="feedback-container">
+            <div class="section-header-row">
+                <div class="section-title-wrap">
+                    <h2>💬 MGM Campus Feedback</h2>
+                    <p>What students and faculty say about our smart canteen service</p>
+                </div>
+                <button class="btn-secondary" onclick="document.getElementById('review-form-modal').classList.add('open')">
+                    ✍️ Write a Review
+                </button>
+            </div>
+
+            <div class="testimonials-grid" id="testimonials-grid">
+                <!-- Testimonials rendered via js/app.js -->
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. Site Footer -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <div class="footer-logo-row">
+                    <div class="logo-frame" style="width: 42px; height: 42px;">
+                        <img src="Public/mgm-logo.png.png" alt="MGM Crest" class="college-logo-img">
+                    </div>
+                    <div>
+                        <div style="font-size: 1.05rem; font-weight: 800; color: #FFFFFF;">MGMCET Smart Canteen</div>
+                        <div style="font-size: 0.75rem; color: var(--primary);">Kamothe, Navi Mumbai</div>
+                    </div>
+                </div>
+                <p class="footer-desc">
+                    Empowering students and faculty with seamless, contactless campus dining. Fresh ingredients, lightning speed, zero queues.
+                </p>
+            </div>
+
+            <div class="footer-col">
+                <h4>Quick Navigation</h4>
+                <ul class="footer-links">
+                    <li><a href="#combos">Campus Combos</a></li>
+                    <li><a href="#menu">Breakfast & Snacks</a></li>
+                    <li><a href="#menu">South Indian Corner</a></li>
+                    <li><a href="#menu">Thali & Full Meals</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Canteen Services</h4>
+                <ul class="footer-links">
+                    <li><a href="javascript:void(0)" onclick="window.SmartCanteen.openActiveOrderModal()">Digital Token Tracker</a></li>
+                    <li><a href="javascript:void(0)" onclick="window.SmartCanteen.openDrawer()">Order Tray</a></li>
+                    <li><a href="javascript:void(0)" onclick="window.SmartCanteen.openStaffModal()">Kitchen Staff Portal</a></li>
+                    <li><a href="#crowd-status">Peak Rush Timings</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Campus Address</h4>
+                <p style="font-size: 0.85rem; line-height: 1.6; margin-bottom: 8px;">
+                    Mahatma Gandhi Mission College of Engineering and Technology<br>
+                    Sector 1, Kamothe, Navi Mumbai, Maharashtra 410209
+                </p>
+                <p style="font-size: 0.85rem; color: #F8FAFC;">
+                    📞 +91 22 2743 3403<br>
+                    ✉️ canteen@mgmmumbai.ac.in
+                </p>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <div>
+                © 2026 Mahatma Gandhi Mission (MGM) College of Engineering & Technology. All rights reserved.
+            </div>
+            <div style="display: flex; gap: 14px;">
+                <span>Digital Food Court Initiative</span>
+                <span>•</span>
+                <span>Pursuit of Excellence</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ==================== MODALS & DRAWERS ==================== -->
+
+    <!-- Mobile Bottom Floating Action Bar -->
+    <div class="mobile-bottom-bar">
+        <button class="mobile-cart-btn" onclick="window.SmartCanteen.openDrawer()">
+            <span>🛒 View Tray</span>
+            <span id="mobile-cart-total">₹0 (0 items)</span>
+        </button>
+    </div>
+    </div> <!-- ==================== END #dashboard-view ==================== -->
+
+    <!-- Cart Slide-Over Drawer -->
+    <div class="cart-drawer-overlay" id="cart-drawer-overlay" onclick="window.SmartCanteen.closeDrawer()"></div>
+    <div class="cart-drawer" id="cart-drawer">
+        <div class="drawer-header">
+            <div class="drawer-title">
+                <span>🛒</span> Your Order Tray
+            </div>
+            <button class="close-btn" onclick="window.SmartCanteen.closeDrawer()">✕</button>
+        </div>
+
+        <div class="drawer-body">
+            <!-- Pickup Mode Switch -->
+            <div>
+                <label style="font-size: 0.78rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 6px; display: block;">
+                    Dining Preference:
+                </label>
+                <div class="pickup-type-switch">
+                    <div class="switch-option active" id="pickup-counter-btn" onclick="window.SmartCanteen.setPickupType('counter')">
+                        🚶‍♂️ Self Counter Pickup
+                    </div>
+                    <div class="switch-option" id="pickup-table-btn" onclick="window.SmartCanteen.setPickupType('table')">
+                        🪑 Table Delivery
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table Number Selector (Hidden by default) -->
+            <div class="checkout-input-group" id="table-select-group" style="display: none;">
+                <label>Select Table Number:</label>
+                <select class="input-field" onchange="window.SmartCanteen.setTableNumber(this.value)">
+                    <option value="Table 01">Table 01 (Near Counter)</option>
+                    <option value="Table 04" selected>Table 04 (Window Side)</option>
+                    <option value="Table 08">Table 08 (Center Hall)</option>
+                    <option value="Table 12">Table 12 (Faculty Section)</option>
+                    <option value="Table 18">Table 18 (Garden View)</option>
+                    <option value="Faculty Common Room">Staff / Faculty Common Room</option>
+                </select>
+            </div>
+
+            <!-- Student PRN / Info -->
+            <div class="checkout-input-group">
+                <label>Student / Faculty Name:</label>
+                <input type="text" id="student-name-input" class="input-field" placeholder="e.g. Aditya Verma">
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <div class="checkout-input-group">
+                    <label>Roll / PRN No:</label>
+                    <input type="text" id="student-prn-input" class="input-field" placeholder="21MGMCE048">
+                </div>
+                <div class="checkout-input-group">
+                    <label>Mobile No:</label>
+                    <input type="tel" id="student-phone-input" class="input-field" placeholder="9820198201">
+                </div>
+            </div>
+
+            <!-- Cart Items List -->
+            <div>
+                <label style="font-size: 0.78rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 6px; display: block;">
+                    Tray Items:
+                </label>
+                <div id="cart-empty-notice" style="text-align: center; padding: 2rem 1rem; color: var(--text-muted);">
+                    <div style="font-size: 2.5rem; margin-bottom: 8px;">🍽️</div>
+                    <p>Your food tray is empty.</p>
+                    <p style="font-size: 0.8rem;">Add some mouth-watering items from the menu!</p>
+                </div>
+                <div class="cart-items-list" id="cart-items-list">
+                    <!-- Items rendered dynamically -->
+                </div>
+            </div>
+
+            <!-- Coupon Input -->
+            <div class="checkout-input-group">
+                <label>Have a Campus Coupon?</label>
+                <div class="coupon-box">
+                    <input type="text" id="coupon-input" class="input-field coupon-input" placeholder="e.g. MGM10">
+                    <button class="btn-apply-coupon" onclick="window.SmartCanteen.applyCoupon()">Apply</button>
+                </div>
+                <span style="font-size: 0.74rem; color: var(--text-muted);">💡 Try: <strong>MGM10</strong> for 10% off</span>
+            </div>
+        </div>
+
+        <div class="drawer-footer">
+            <div class="bill-breakdown" id="cart-bill-breakdown">
+                <div class="bill-row">
+                    <span>Subtotal:</span>
+                    <span id="bill-subtotal">₹0</span>
+                </div>
+                <div class="bill-row">
+                    <span>Coupon Discount:</span>
+                    <span id="bill-discount" style="color: var(--veg-color);">-₹0</span>
+                </div>
+                <div class="bill-row">
+                    <span>Digital Canteen Service:</span>
+                    <span id="bill-fee">₹2</span>
+                </div>
+                <div class="bill-row total">
+                    <span>Total Amount:</span>
+                    <span id="bill-final-total" style="color: var(--primary);">₹0</span>
+                </div>
+            </div>
+
+            <button class="btn-checkout" id="btn-checkout-submit" onclick="window.SmartCanteen.proceedToCheckout()" disabled>
+                <span>Proceed to Pay</span> (<span id="checkout-pay-amt">₹0</span>) ➔
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL: COMPREHENSIVE MULTI-OPTION PAYMENT GATEWAY ==================== -->
+    <div class="modal-overlay" id="payment-modal">
+        <div class="modal-card payment-modal-card">
+            <div class="modal-header">
+                <div>
+                    <div class="modal-title">Campus Checkout & Payment</div>
+                    <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px;">
+                        MGM FastTrack Instant Digital Token Processing
+                    </p>
+                </div>
+                <button class="close-btn" onclick="window.SmartCanteen.closeModal('payment-modal')">✕</button>
+            </div>
+
+            <!-- Order Summary Banner -->
+            <div class="pay-summary-banner">
+                <div class="pay-summary-col">
+                    <span class="pay-summary-label">Order Items:</span>
+                    <strong id="pay-summary-items">0 items</strong>
+                </div>
+                <div class="pay-summary-col">
+                    <span class="pay-summary-label">Dining Mode:</span>
+                    <strong id="pay-summary-mode">Self Counter Pickup</strong>
+                </div>
+                <div class="pay-summary-col highlight">
+                    <span class="pay-summary-label">Total Payable:</span>
+                    <strong id="pay-modal-amount">₹0</strong>
+                </div>
+            </div>
+
+            <!-- Payment Method Segment Tabs -->
+            <div class="payment-tabs-header">
+                <button type="button" class="pay-tab active" id="pay-tab-upi" onclick="window.SmartCanteen.setPaymentMethod('upi')">
+                    <span class="pay-tab-icon">📱</span>
+                    <span class="pay-tab-name">UPI ID</span>
+                </button>
+                <button type="button" class="pay-tab" id="pay-tab-phonepe" onclick="window.SmartCanteen.setPaymentMethod('phonepe')">
+                    <span class="pay-tab-icon">🟣</span>
+                    <span class="pay-tab-name">PhonePe</span>
+                </button>
+                <button type="button" class="pay-tab" id="pay-tab-qr" onclick="window.SmartCanteen.setPaymentMethod('qr')">
+                    <span class="pay-tab-icon">🔲</span>
+                    <span class="pay-tab-name">QR Code</span>
+                </button>
+                <button type="button" class="pay-tab" id="pay-tab-card" onclick="window.SmartCanteen.setPaymentMethod('card')">
+                    <span class="pay-tab-icon">💳</span>
+                    <span class="pay-tab-name">Debit Card</span>
+                </button>
+            </div>
+
+            <!-- Validation Alert Box for Payment -->
+            <div id="payment-error-alert" class="login-alert" style="display: none; margin: 0.75rem 0;">
+                <span class="alert-icon">⚠️</span>
+                <span id="payment-error-msg">Please fill in all required payment details.</span>
+            </div>
+
+            <!-- Dynamic Payment Method Panels -->
+            <div class="payment-panels-container">
+
+                <!-- 1. UPI ID Panel -->
+                <div class="pay-panel active" id="pay-panel-upi">
+                    <div class="pay-panel-header">
+                        <h4>Pay via UPI Virtual Private Address (VPA)</h4>
+                        <p>Works with Google Pay, PhonePe, Paytm, BHIM, and all bank UPI apps.</p>
+                    </div>
+
+                    <div class="checkout-input-group">
+                        <label for="pay-upi-id">Enter your UPI ID / VPA:</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">📱</span>
+                            <input type="text" id="pay-upi-id" class="input-field" placeholder="e.g. yourname@okhdfcbank">
+                        </div>
+                    </div>
+
+                    <!-- Quick Handles -->
+                    <div class="upi-handles-row">
+                        <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">Quick Handles:</span>
+                        <button type="button" class="handle-chip" onclick="window.SmartCanteen.appendUpiHandle('@okhdfcbank')">@okhdfcbank</button>
+                        <button type="button" class="handle-chip" onclick="window.SmartCanteen.appendUpiHandle('@okaxis')">@okaxis</button>
+                        <button type="button" class="handle-chip" onclick="window.SmartCanteen.appendUpiHandle('@paytm')">@paytm</button>
+                        <button type="button" class="handle-chip" onclick="window.SmartCanteen.appendUpiHandle('@ybl')">@ybl</button>
+                    </div>
+
+                    <div class="pay-secure-note">
+                        🔒 A collect authorization notification will be sent to your UPI app.
+                    </div>
+                </div>
+
+                <!-- 2. PhonePe Panel -->
+                <div class="pay-panel" id="pay-panel-phonepe">
+                    <div class="pay-panel-header phonepe-theme">
+                        <div class="phonepe-badge-brand">
+                            <span class="phonepe-logo-circle">पे</span>
+                            <span>PhonePe Express Pay</span>
+                        </div>
+                        <p>Instant UPI collect request to your registered PhonePe mobile number.</p>
+                    </div>
+
+                    <div class="checkout-input-group">
+                        <label for="pay-phonepe-mobile">PhonePe Registered Mobile Number:</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">📞</span>
+                            <input type="tel" id="pay-phonepe-mobile" class="input-field" placeholder="10-digit mobile number" maxlength="10">
+                        </div>
+                    </div>
+
+                    <div class="phonepe-perk-box">
+                        <span>⚡ 1-Click Fast Approval on PhonePe App</span>
+                        <span>🛡️ NPCI Verified & Safe</span>
+                    </div>
+                </div>
+
+                <!-- 3. QR Code Panel -->
+                <div class="pay-panel" id="pay-panel-qr">
+                    <div class="pay-panel-header" style="text-align: center;">
+                        <h4>Scan & Pay with Any UPI App</h4>
+                        <p>Open GPay, PhonePe, Paytm, or BHIM and scan this counter QR code.</p>
+                    </div>
+
+                    <div class="dynamic-qr-box">
+                        <div class="qr-glow-frame">
+                            <svg width="170" height="170" viewBox="0 0 100 100" class="qr-svg-graphic">
+                                <rect width="100" height="100" fill="#ffffff" rx="8" />
+                                <!-- Outer positioning squares -->
+                                <rect x="6" y="6" width="26" height="26" fill="#0D2149" rx="3" />
+                                <rect x="10" y="10" width="18" height="18" fill="#ffffff" rx="2" />
+                                <rect x="13" y="13" width="12" height="12" fill="#FF6600" rx="1" />
+
+                                <rect x="68" y="6" width="26" height="26" fill="#0D2149" rx="3" />
+                                <rect x="72" y="10" width="18" height="18" fill="#ffffff" rx="2" />
+                                <rect x="75" y="13" width="12" height="12" fill="#FF6600" rx="1" />
+
+                                <rect x="6" y="68" width="26" height="26" fill="#0D2149" rx="3" />
+                                <rect x="10" y="72" width="18" height="18" fill="#ffffff" rx="2" />
+                                <rect x="13" y="75" width="12" height="12" fill="#FF6600" rx="1" />
+
+                                <!-- Pattern data -->
+                                <rect x="38" y="10" width="8" height="8" fill="#0D2149" />
+                                <rect x="52" y="10" width="8" height="8" fill="#0D2149" />
+                                <rect x="38" y="24" width="22" height="6" fill="#0D2149" />
+                                <rect x="10" y="38" width="80" height="5" fill="#0D2149" />
+                                <rect x="14" y="48" width="14" height="8" fill="#0D2149" />
+                                <rect x="34" y="48" width="32" height="8" fill="#FF6600" />
+                                <rect x="72" y="48" width="16" height="8" fill="#0D2149" />
+                                <rect x="38" y="64" width="14" height="18" fill="#0D2149" />
+                                <rect x="58" y="64" width="10" height="12" fill="#0D2149" />
+                                <rect x="74" y="70" width="18" height="16" fill="#0D2149" />
+
+                                <!-- Center MGM Emblem -->
+                                <circle cx="50" cy="50" r="11" fill="#0D2149" />
+                                <text x="50" y="53" font-size="7" fill="#FF6600" font-weight="900" text-anchor="middle" font-family="Outfit, sans-serif">MGM</text>
+                            </svg>
+                        </div>
+
+                        <div class="qr-details-text">
+                            <div class="qr-amt-display">Pay: <span id="qr-payable-amt">₹0</span></div>
+                            <div class="qr-upi-id">UPI ID: <strong>mgmcet.canteen@sbi</strong></div>
+                            <div class="qr-timer-pill">
+                                <span>⏱️ QR Valid for:</span>
+                                <strong id="qr-countdown-timer">04:59 mins</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Debit Card Panel -->
+                <div class="pay-panel" id="pay-panel-card">
+                    <div class="pay-panel-header">
+                        <h4>Pay with Debit or Credit Card</h4>
+                        <p>All RuPay, Visa, and Mastercard cards accepted.</p>
+                    </div>
+
+                    <!-- Interactive Realistic Card Graphic -->
+                    <div class="interactive-card-preview">
+                        <div class="card-glass-front">
+                            <div class="card-chip-row">
+                                <div class="card-chip"></div>
+                                <div class="card-network-logo" id="preview-card-network">RuPay / Visa</div>
+                            </div>
+                            <div class="card-number-display" id="preview-card-number">•••• •••• •••• ••••</div>
+                            <div class="card-footer-row">
+                                <div>
+                                    <div class="card-mini-label">CARDHOLDER</div>
+                                    <div class="card-holder-display" id="preview-card-name">STUDENT NAME</div>
+                                </div>
+                                <div>
+                                    <div class="card-mini-label">EXPIRES</div>
+                                    <div class="card-expiry-display" id="preview-card-expiry">MM/YY</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card Form Inputs -->
+                    <div class="card-inputs-grid">
+                        <div class="checkout-input-group full-width">
+                            <label for="card-holder-name">Cardholder Name:</label>
+                            <input type="text" id="card-holder-name" class="input-field" placeholder="Full Name on Card" oninput="window.SmartCanteen.updateCardPreview()">
+                        </div>
+
+                        <div class="checkout-input-group full-width">
+                            <label for="card-number-input">Card Number:</label>
+                            <input type="text" id="card-number-input" class="input-field" placeholder="1234 5678 9012 3456" maxlength="19" oninput="window.SmartCanteen.updateCardPreview()">
+                        </div>
+
+                        <div class="checkout-input-group">
+                            <label for="card-expiry-input">Expiry Date:</label>
+                            <input type="text" id="card-expiry-input" class="input-field" placeholder="MM/YY" maxlength="5" oninput="window.SmartCanteen.updateCardPreview()">
+                        </div>
+
+                        <div class="checkout-input-group">
+                            <label for="card-cvv-input">CVV / CVC:</label>
+                            <input type="password" id="card-cvv-input" class="input-field" placeholder="•••" maxlength="3">
+                        </div>
+                    </div>
+
+                    <div style="font-size: 0.72rem; color: var(--text-muted); text-align: center; margin-top: 6px;">
+                        🔒 Campus Demo Gateway • No real card charges will occur
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Payment Action Buttons -->
+            <div class="pay-actions-column">
+                <button type="button" class="btn-primary btn-pay-now" id="btn-pay-submit" onclick="window.SmartCanteen.submitPayment()">
+                    <span id="pay-btn-label">Pay ₹0 & Generate Token ➔</span>
+                    <span class="pay-spinner" style="display: none;"></span>
+                </button>
+
+                <button type="button" class="btn-secondary btn-cash-counter" onclick="window.SmartCanteen.payCashCounter()">
+                    💵 Pay Cash at Canteen Counter
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL: FORGOT PASSWORD HELPDESK ==================== -->
+    <div class="modal-overlay" id="forgot-pwd-modal">
+        <div class="modal-card" style="max-width: 440px;">
+            <div class="modal-header">
+                <div class="modal-title">🔐 Reset Campus Password</div>
+                <button class="close-btn" onclick="window.SmartCanteen.closeModal('forgot-pwd-modal')">✕</button>
+            </div>
+            <div style="padding: 1rem 0; line-height: 1.6; font-size: 0.88rem; color: var(--text-secondary);">
+                <p style="margin-bottom: 0.75rem;">
+                    Your Smart Canteen credentials are tied directly to your <strong>MGM ERP / Student UID</strong>.
+                </p>
+                <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 12px 14px; margin-bottom: 1rem;">
+                    <div style="font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">MGMCET IT & Canteen Helpdesk:</div>
+                    <div>📍 Academic Block B, Ground Floor, Kamothe</div>
+                    <div>✉️ canteen@mgmmumbai.ac.in</div>
+                    <div>📞 Campus Ext: 204 / +91 22 2743 3403</div>
+                </div>
+                <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.5rem;">
+                    💡 You can also use the evaluation credentials: UID <strong>21MGMCE048</strong> and Password <strong>mgm@2026</strong>.
+                </p>
+            </div>
+            <button class="btn-primary" style="width: 100%; justify-content: center;" onclick="window.SmartCanteen.closeModal('forgot-pwd-modal')">
+                Got it, Back to Login
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal: Live Order Status & Digital Token (KOT) -->
+    <div class="modal-overlay" id="order-status-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title">Digital Token (KOT)</div>
+                <button class="close-btn" onclick="window.SmartCanteen.closeModal('order-status-modal')">✕</button>
+            </div>
+
+            <!-- Big Token Highlight -->
+            <div class="token-card-highlight">
+                <div class="token-label">MGM CANTEEN TOKEN NUMBER</div>
+                <div class="token-big-number" id="modal-token-display">#MGM-402</div>
+                <div style="font-size: 0.82rem; color: #CBD5E1; margin-top: 4px;">
+                    Order ID: <span id="modal-order-id">ORD-918231</span>
+                </div>
+            </div>
+
+            <!-- Order Details -->
+            <div style="background: var(--bg-surface-elevated); padding: 12px 14px; border-radius: var(--radius-md); font-size: 0.84rem; margin-bottom: 1.25rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                    <span style="color: var(--text-muted);">Student:</span>
+                    <strong id="modal-student-info">Aditya Verma • 21MGMCE048</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                    <span style="color: var(--text-muted);">Pickup / Delivery:</span>
+                    <strong id="modal-delivery-mode">Self Counter Pickup</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-muted);">Total Paid:</span>
+                    <strong id="modal-order-total" style="color: var(--primary);">₹120</strong>
+                </div>
+            </div>
+
+            <!-- Live Status Timeline -->
+            <div class="tracker-timeline">
+                <div class="timeline-step completed" id="track-step-1">
+                    <div class="timeline-dot">1</div>
+                    <div class="timeline-content">
+                        <h5>Order Placed & Confirmed</h5>
+                        <p>Kitchen ticket received by chef</p>
+                    </div>
+                </div>
+                <div class="timeline-step active" id="track-step-2">
+                    <div class="timeline-dot">2</div>
+                    <div class="timeline-content">
+                        <h5>Chef is Cooking / Preparing</h5>
+                        <p>Fresh ingredients are on the grill</p>
+                    </div>
+                </div>
+                <div class="timeline-step" id="track-step-3">
+                    <div class="timeline-dot">3</div>
+                    <div class="timeline-content">
+                        <h5>Ready for Counter Pickup 🔔</h5>
+                        <p>Head to Counter #2 with this screen</p>
+                    </div>
+                </div>
+                <div class="timeline-step" id="track-step-4">
+                    <div class="timeline-dot">4</div>
+                    <div class="timeline-content">
+                        <h5>Order Collected</h5>
+                        <p>Enjoy your meal at MGM!</p>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-primary" id="btn-collect-order" style="width: 100%; justify-content: center; display: none;">
+                ✅ Mark as Collected / Received
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal: Kitchen & Canteen Staff Management Dashboard -->
+    <div class="modal-overlay" id="staff-modal">
+        <div class="modal-card staff-modal-card">
+            <div class="modal-header">
+                <div>
+                    <div class="modal-title">👨‍🍳 Canteen Kitchen Operator Portal</div>
+                    <p style="font-size: 0.8rem; color: var(--text-secondary);">MGM College of Engineering, Navi Mumbai</p>
+                </div>
+                <button class="close-btn" onclick="window.SmartCanteen.closeModal('staff-modal')">✕</button>
+            </div>
+
+            <!-- Crowd Rush Quick Controller -->
+            <div style="background: var(--bg-surface-elevated); padding: 12px 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 1.25rem;">
+                <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">
+                    Broadcast Current Campus Rush Level:
+                </div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <button class="btn-secondary" style="padding: 6px 14px; font-size: 0.82rem;" onclick="window.SmartCanteen.setCrowdLevel('low')">
+                        🟢 Low Rush (5-8m)
+                    </button>
+                    <button class="btn-secondary" style="padding: 6px 14px; font-size: 0.82rem;" onclick="window.SmartCanteen.setCrowdLevel('moderate')">
+                        🟡 Moderate (10-15m)
+                    </button>
+                    <button class="btn-secondary" style="padding: 6px 14px; font-size: 0.82rem;" onclick="window.SmartCanteen.setCrowdLevel('peak')">
+                        🔴 Peak Lunch Rush (20-25m)
+                    </button>
+                </div>
+            </div>
+
+            <h4 style="font-size: 1.05rem; margin-bottom: 8px;">Incoming Order Queue (Live KOT)</h4>
+            <div class="staff-orders-grid" id="staff-orders-queue">
+                <!-- Orders rendered via js/app.js -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Submit Review -->
+    <div class="modal-overlay" id="review-form-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title">Rate Your Canteen Experience</div>
+                <button class="close-btn" onclick="window.SmartCanteen.closeModal('review-form-modal')">✕</button>
+            </div>
+
+            <form onsubmit="window.SmartCanteen.submitReview(event)">
+                <div class="checkout-input-group" style="margin-bottom: 1rem;">
+                    <label>Your Name:</label>
+                    <input type="text" id="rev-name" class="input-field" placeholder="e.g. Shruti Patil" required>
+                </div>
+                <div class="checkout-input-group" style="margin-bottom: 1rem;">
+                    <label>Branch / Department:</label>
+                    <input type="text" id="rev-dept" class="input-field" placeholder="e.g. IT Department, 2nd Year" required>
+                </div>
+                <div class="checkout-input-group" style="margin-bottom: 1.25rem;">
+                    <label>Your Feedback / Favourite Dish:</label>
+                    <textarea id="rev-msg" class="input-field" rows="3" placeholder="Tell us how the food and service was..." required></textarea>
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;">
+                    Submit Feedback 🌟
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
