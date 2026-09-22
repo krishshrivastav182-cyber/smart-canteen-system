@@ -22,7 +22,7 @@ A smart digital canteen portal designed for students of MGM College of Engineeri
 
 ### Login Page
 
-![MGM Smart Canteen Login](screenshots/login.png)
+![MGM Smart Canteen Login](login.png)
 
 ## ⚙️ How to Run
 
